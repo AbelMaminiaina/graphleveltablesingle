@@ -1,0 +1,46 @@
+using Microsoft.AspNetCore.Mvc;
+using GraphLevel1.Web.Models;
+using GraphLevel1.Web.Services;
+
+namespace GraphLevel1.Web.Controllers;
+
+public class HomeController : Controller
+{
+    private readonly IGraphService _graphService;
+
+    public HomeController(IGraphService graphService)
+    {
+        _graphService = graphService;
+    }
+
+    // GET: / - Ecran 1: Recherche
+    public IActionResult Index()
+    {
+        return View(new SearchViewModel());
+    }
+
+    // POST: /Home/Search - Recherche par 4 inputs
+    [HttpPost]
+    public async Task<IActionResult> Search(SearchViewModel model)
+    {
+        model.HasSearched = true;
+
+        if (string.IsNullOrWhiteSpace(model.Input1) &&
+            string.IsNullOrWhiteSpace(model.Input2) &&
+            string.IsNullOrWhiteSpace(model.Input3) &&
+            string.IsNullOrWhiteSpace(model.Input4))
+        {
+            ModelState.AddModelError("", "Veuillez entrer au moins un critere de recherche");
+            return View("Index", model);
+        }
+
+        model.Results = await _graphService.SearchByInputsAsync(
+            model.Input1,
+            model.Input2,
+            model.Input3,
+            model.Input4
+        );
+
+        return View("Index", model);
+    }
+}

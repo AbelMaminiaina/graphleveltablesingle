@@ -1,0 +1,210 @@
+@model GraphLevel1.Web.Models.GraphViewModel
+@{
+    ViewData["Title"] = $"Graphe - {Model.Transformation}";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Recherche</a></li>
+        <li class="breadcrumb-item active">@Model.Transformation</li>
+    </ol>
+</nav>
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">@Model.Transformation</h4>
+            <span class="badge bg-light text-dark">Type @Model.IdType</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Proprietaire:</strong> @(Model.Proprietaire ?? "Non defini")</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <span class="badge bg-danger me-2">@Model.Predecessors.Count Predecesseurs</span>
+                <span class="badge bg-success">@Model.Successors.Count Successeurs</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Inputs:</h6>
+                <ul class="list-unstyled">
+                    @if (!string.IsNullOrEmpty(Model.Input1)) { <li><code>@Model.Input1</code></li> }
+                    @if (!string.IsNullOrEmpty(Model.Input2)) { <li><code>@Model.Input2</code></li> }
+                    @if (!string.IsNullOrEmpty(Model.Input3)) { <li><code>@Model.Input3</code></li> }
+                    @if (!string.IsNullOrEmpty(Model.Input4)) { <li><code>@Model.Input4</code></li> }
+                    @if (string.IsNullOrEmpty(Model.Input1) && string.IsNullOrEmpty(Model.Input2) &&
+                         string.IsNullOrEmpty(Model.Input3) && string.IsNullOrEmpty(Model.Input4))
+                    {
+                        <li><em class="text-muted">Aucun input</em></li>
+                    }
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Outputs:</h6>
+                <ul class="list-unstyled">
+                    @if (!string.IsNullOrEmpty(Model.Output1)) { <li><code>@Model.Output1</code></li> }
+                    @if (!string.IsNullOrEmpty(Model.Output2)) { <li><code>@Model.Output2</code></li> }
+                    @if (!string.IsNullOrEmpty(Model.Output3)) { <li><code>@Model.Output3</code></li> }
+                    @if (!string.IsNullOrEmpty(Model.Output4)) { <li><code>@Model.Output4</code></li> }
+                    @if (string.IsNullOrEmpty(Model.Output1) && string.IsNullOrEmpty(Model.Output2) &&
+                         string.IsNullOrEmpty(Model.Output3) && string.IsNullOrEmpty(Model.Output4))
+                    {
+                        <li><em class="text-muted">Aucun output</em></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Tableau Predecesseurs -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    Predecesseurs directs (Niveau 1)
+                    <span class="badge bg-light text-dark float-end">@Model.Predecessors.Count</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Predecessors.Any())
+                {
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Transformation</th>
+                                <th>Lien</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Predecessors)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Transformation</strong>
+                                        <br/>
+                                        <small class="text-muted">@item.Proprietaire</small>
+                                    </td>
+                                    <td>
+                                        <code>@item.LinkingData</code>
+                                    </td>
+                                    <td>
+                                        <a href="/Graph/Details?transformation=@System.Net.WebUtility.UrlEncode(item.Transformation)" class="btn btn-sm btn-outline-danger">
+                                            Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <em>Aucun predecesseur (noeud source)</em>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau Successeurs -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    Successeurs directs (Niveau 1)
+                    <span class="badge bg-light text-dark float-end">@Model.Successors.Count</span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Successors.Any())
+                {
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Transformation</th>
+                                <th>Lien</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Successors)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Transformation</strong>
+                                        <br/>
+                                        <small class="text-muted">@item.Proprietaire</small>
+                                    </td>
+                                    <td>
+                                        <code>@item.LinkingData</code>
+                                    </td>
+                                    <td>
+                                        <a href="/Graph/Details?transformation=@System.Net.WebUtility.UrlEncode(item.Transformation)" class="btn btn-sm btn-outline-success">
+                                            Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="p-4 text-center text-muted">
+                        <em>Aucun successeur (noeud terminal)</em>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualisation des liens directs -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="mb-0">Liens directs (Niveau 1)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-danger">Depuis (Predecesseurs):</h6>
+                        @if (Model.Predecessors.Any())
+                        {
+                            @foreach (var item in Model.Predecessors)
+                            {
+                                <div class="mb-1"><code>@item.Path</code></div>
+                            }
+                        }
+                        else
+                        {
+                            <em class="text-muted">Aucun predecesseur</em>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-success">Vers (Successeurs):</h6>
+                        @if (Model.Successors.Any())
+                        {
+                            @foreach (var item in Model.Successors)
+                            {
+                                <div class="mb-1"><code>@item.Path</code></div>
+                            }
+                        }
+                        else
+                        {
+                            <em class="text-muted">Aucun successeur</em>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
